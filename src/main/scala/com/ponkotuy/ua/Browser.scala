@@ -1,10 +1,14 @@
 package com.ponkotuy.ua
 
-sealed abstract class Browser(val name: String, val version: String)
+sealed abstract class Browser(val name: String, val version: String) extends Ordered[Browser] {
+  override def compare(that: Browser): Int = Browser.ordering.compare(this, that)
+}
 
 object Browser {
   case class IE(override val version: String) extends Browser("IE", version)
   case class Edge(override val version: String) extends Browser("Edge", version)
+
+  implicit val ordering: Ordering[Browser] = Ordering.by { b => (b.name, b.version) }
 
   def find(str: String): Option[Browser] =
     BrowserParser.values.toStream.flatMap(_.parse(str)).headOption
